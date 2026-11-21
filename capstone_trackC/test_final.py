@@ -9,8 +9,11 @@ from env.stimulus import KeyTxn
 
 from env.gate_env import EXPECTED_KEY, GateEnv
 
-@cocotb.test()
+HERE = os.path.dirname(os.path.abspath(__file__))
+SEED = int(os.environ.get("SEED", "0xC0FFEE"), 0) # the default is the seed you report
+STEPS = 2000
 
+@cocotb.test()
 async def test_first_steps(dut):
     """F1, F2, F3: a wrong key, the right key twice, a wrong key again."""
     env = GateEnv(dut)
@@ -20,10 +23,6 @@ async def test_first_steps(dut):
 
     dut._log.info(f"checked {env.steps} steps against the contract; count = {env.count}")
 
-
-HERE = os.path.dirname(os.path.abspath(__file__))
-SEED = int(os.environ.get("SEED", "0xC0FFEE"), 0) # the default is the seed you report
-STEPS = 2000
 
 @cocotb.test()
 async def test_random_keys(dut):
