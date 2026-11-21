@@ -1,1 +1,14 @@
-
+# mutants_mine.yaml -- bugs WE wrote. The released pool's format.
+# To Run:
+# python -m craft_mutate.mutate --tb capstone/trojan --sim icarus \
+# --pool capstone/trojan/mutants_mine.yaml --dut-dir capstone/trojan
+dut: secure_gate_clean.sv
+mutants:
+- id: key_zero_opens
+desc: "F1: a second key, all zeros, also unlocks"
+find: "assign unlocked = key_ok;"
+replace: "assign unlocked = key_ok | (key == 32'd0);"
+- id: my_backdoor
+desc: "F1: a second key of our own choosing also unlocks (the SPEC.md trojan, with a new key)"
+find: "assign unlocked = key_ok;"
+replace: "assign unlocked = key_ok | (key == 32'hC0FF_EE00);"
