@@ -1,0 +1,37 @@
+gate:
+  cover_percentage: 100.0
+  coverage: 8
+  size: 8
+  type: <class 'cocotb_coverage.coverage.CoverItem'>
+gate.before:
+  at_least: 1
+  bins:_hits:
+    locked: 970
+    unlocked: 1030
+  cover_percentage: 100.0
+  coverage: 2
+  size: 2
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+gate.before_x_now:
+  at_least: 1
+  bins:_hits:
+    ('locked', 'locked'): 552
+    ('locked', 'unlocked'): 418
+    ('unlocked', 'locked'): 417
+    ('unlocked', 'unlocked'): 613
+  cover_percentage: 100.0
+  coverage: 4
+  size: 4
+  type: <class 'cocotb_coverage.coverage.CoverCross'>
+  weight: 1
+gate.now:
+  at_least: 1
+  bins:_hits:
+    locked: 969
+    unlocked: 1031
+  cover_percentage: 100.0
+  coverage: 2
+  size: 2
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
