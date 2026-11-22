@@ -4,7 +4,7 @@ import os
 import random
 
 from cocotb_coverage.coverage import coverage_db
-from env.coverage import pct, sample
+from env.coverage import pct, sample, report_stats
 from env.stimulus import KeyTxn
 
 from env.gate_env import EXPECTED_KEY, GateEnv
@@ -47,6 +47,8 @@ async def test_random_keys(dut):
 
     with open(os.path.join(HERE, "curve.csv"), "w") as fh:
         fh.write("steps,before_x_now\n" + "\n".join(curve) + "\n")
-        
+
+    report_stats(dut._log)
     coverage_db.report_coverage(dut._log.info, bins=True)
     coverage_db.export_to_yaml(filename=os.path.join(HERE, "coverage.yml"))
+
