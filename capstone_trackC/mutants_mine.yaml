@@ -4,6 +4,7 @@
 # --pool capstone/trojan/mutants_mine.yaml --dut-dir capstone/trojan
 dut: secure_gate_clean.sv
 mutants:
+# Given by Packet
 - id: key_zero_opens
 desc: "F1: a second key, all zeros, also unlocks"
 find: "assign unlocked = key_ok;"
@@ -12,3 +13,15 @@ replace: "assign unlocked = key_ok | (key == 32'd0);"
 desc: "F1: a second key of our own choosing also unlocks (the SPEC.md trojan, with a new key)"
 find: "assign unlocked = key_ok;"
 replace: "assign unlocked = key_ok | (key == 32'hC0FF_EE00);"
+# Mutation 3:
+- id: reset_does_not_clear_count
+desc: "reset does not clear access_count; the previous count is retained"
+find: "if (!rst_n) cnt <= 8'd0;"
+replace: "if (!rst_n) cnt <= cnt;"
+# Mutation 4:
+- id: data_not_passed_when_unlocked
+desc: "F2: data_out does not match data_in when the correct key unlocks the gate"
+find: "assign data_out = unlocked ? data_in : '0;"
+replace: "assign data_out = unlocked ? 8'hFF : '0;"
+
+
