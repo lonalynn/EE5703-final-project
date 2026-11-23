@@ -23,5 +23,15 @@ replace: "if (!rst_n) cnt <= cnt;"
 desc: "F2: data_out does not match data_in when the correct key unlocks the gate"
 find: "assign data_out = unlocked ? data_in : '0;"
 replace: "assign data_out = unlocked ? 8'hFF : '0;"
+# Mutation 5:
+- id: count_clears_when_locked
+desc: "F3: access_count resets to zero instead of retaining its previous value while the gate is locked"
+find: "else if (unlocked) cnt <= cnt + 8'd1;"
+replace: "else cnt <= 8'd0;"
+Mutation 6:
+- id: key_compare_high16
+desc: "F1: key comparison ignores the lower 16 bits, allowing incorrect keys to unlock"
+find: "assign key_ok   = (key == EXPECTED_KEY);"
+replace: "assign key_ok   = (key[31:16] == EXPECTED_KEY[31:16]);"
 
 
