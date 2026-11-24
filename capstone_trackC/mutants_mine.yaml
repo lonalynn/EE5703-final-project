@@ -1,37 +1,38 @@
-# mutants_mine.yaml -- bugs WE wrote. The released pool's format.
-# To Run:
-# python -m craft_mutate.mutate --tb capstone/trojan --sim icarus \
-# --pool capstone/trojan/mutants_mine.yaml --dut-dir capstone/trojan
+# secure_gate mutation pool -- RELEASED (practice).  Score = found / total.
+# Small, exact source transformations of the CLEAN variant secure_gate_clean.sv.
+# A mutant is "found" when your testbench FAILS on it. (We say found, not killed.)
+# NOTE: the planted trojan (secure_gate_trojan.sv) is NOT a mutant in this pool --
+# it is the adversarial variant caught by proving the security property. These
+# mutants train the functional/observability side of the suite.
+# Run:  python -m craft_mutate.mutate --tb capstone/trojan \
+#           --pool capstone/trojan/mutants_released.yaml --dut-dir capstone/trojan --sim icarus
 dut: secure_gate_clean.sv
 mutants:
-# Given by Packet
-- id: key_zero_opens
-desc: "F1: a second key, all zeros, also unlocks"
-find: "assign unlocked = key_ok;"
-replace: "assign unlocked = key_ok | (key == 32'd0);"
-- id: my_backdoor
-desc: "F1: a second key of our own choosing also unlocks (the SPEC.md trojan, with a new key)"
-find: "assign unlocked = key_ok;"
-replace: "assign unlocked = key_ok | (key == 32'hC0FF_EE00);"
-# Mutation 3:
-- id: reset_does_not_clear_count
-desc: "reset does not clear access_count; the previous count is retained"
-find: "if (!rst_n) cnt <= 8'd0;"
-replace: "if (!rst_n) cnt <= cnt;"
-# Mutation 4:
-- id: data_not_passed_when_unlocked
-desc: "F2: data_out does not match data_in when the correct key unlocks the gate"
-find: "assign data_out = unlocked ? data_in : '0;"
-replace: "assign data_out = unlocked ? 8'hFF : '0;"
-# Mutation 5:
-- id: count_clears_when_locked
-desc: "F3: access_count resets to zero instead of retaining its previous value while the gate is locked"
-find: "else if (unlocked) cnt <= cnt + 8'd1;"
-replace: "else cnt <= 8'd0;"
-Mutation 6:
-- id: key_compare_high16
-desc: "F1: key comparison ignores the lower 16 bits, allowing incorrect keys to unlock"
-find: "assign key_ok   = (key == EXPECTED_KEY);"
-replace: "assign key_ok   = (key[31:16] == EXPECTED_KEY[31:16]);"
-
-
+  - id: key_always_ok
+    desc: "gate ignores the key and is always unlocked"
+    find: "assign key_ok   = (key == EXPECTED_KEY);"
+    replace: "assign key_ok   = 1'b1;"
+  - id: key_compare_low16
+    desc: "key check compares only the low 16 bits (near-miss keys unlock)"
+    find: "assign key_ok   = (key == EXPECTED_KEY);"
+    replace: "assign key_ok   = (key[15:0] == EXPECTED_KEY[15:0]);"
+  - id: unlock_inverted
+    desc: "unlocked is inverted (wrong key opens, right key locks)"
+    find: "assign unlocked = key_ok;"
+    replace: "assign unlocked = ~key_ok;"
+  - id: data_leak_when_locked
+    desc: "data_out always passes data_in (no masking while locked)"
+    find: "assign data_out = unlocked ? data_in : '0;"
+    replace: "assign data_out = data_in;"
+  - id: data_zero_when_unlocked
+    desc: "data path inverted: outputs zero when unlocked, data when locked"
+    find: "assign data_out = unlocked ? data_in : '0;"
+    replace: "assign data_out = unlocked ? '0 : data_in;"
+  - id: count_never_increments
+    desc: "access_count is stuck (never advances while unlocked)"
+    find: "else if (unlocked) cnt <= cnt + 8'd1;"
+    replace: "else if (unlocked) cnt <= cnt;"
+  - id: count_increments_when_locked
+    desc: "access_count advances every cycle, even while locked"
+    find: "else if (unlocked) cnt <= cnt + 8'd1;"
+    replace: "else cnt <= cnt + 8'd1;"
