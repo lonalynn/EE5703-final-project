@@ -1,11 +1,4 @@
-""" A key drawn at random from all 32-bit values is the right key once in 232 draws. So the transaction draws a class of key first, and then a key from that
- class. Keep two kinds of constraint apart. legal_c says what each class means. shape_c is your choice: how often each class comes up. 
- 
-  State goes in. right_pct is not random. The test sets the mix before it draws, the way the HW5 guide fed count.
-  The roll comes first. solve_order makes the solver pick the roll before the class, so 30 means 30% (HW5 guide, §3).
- """
 
-"""env/stimulus.py -- constrained-random keys and payloads for secure_gate (pyvsc)."""
 import vsc
 
 from env.gate_env import EXPECTED_KEY
@@ -37,7 +30,7 @@ class KeyTxn:
         with vsc.if_then(self.roll < self.right_pct):
             self.kind == RIGHT
 
-        with vsc.elif_then(self.roll < 60):
+        with vsc.else_if(self.roll < 60):
             self.kind == CLOSE
 
         with vsc.else_then():
